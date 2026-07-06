@@ -1,0 +1,45 @@
+{"id": 1, "stem": "پاکستان کا دارالحکومت ", "options": ["اسلام آباد ہے۔", "لاہور ہے۔", "کراچی ہے۔"], "answer_idx": 0, "translation": "The capital of Pakistan is Islamabad."}
+{"id": 2, "stem": "سورج مشرق سے ", "options": ["طلوع ہوتا ہے۔", "غروب ہوتا ہے۔", "گرتا ہے۔"], "answer_idx": 0, "translation": "The sun rises from the east."}
+{"id": 3, "stem": "پانی سو درجے پر ", "options": ["ابلتا ہے۔", "جمتا ہے۔", "سوکھتا ہے۔"], "answer_idx": 0, "translation": "Water boils at one hundred degrees."}
+{"id": 4, "stem": "برف بہت ", "options": ["ٹھنڈی ہوتی ہے۔", "گرم ہوتی ہے۔", "میٹھی ہوتی ہے۔"], "answer_idx": 0, "translation": "Ice is very cold."}
+{"id": 5, "stem": "پرندے آسمان میں ", "options": ["اڑتے ہیں۔", "تیرتے ہیں۔", "سوتے ہیں۔"], "answer_idx": 0, "translation": "Birds fly in the sky."}
+{"id": 6, "stem": "مچھلی پانی میں ", "options": ["تیرتی ہے۔", "اڑتی ہے۔", "چلتی ہے۔"], "answer_idx": 0, "translation": "A fish swims in water."}
+{"id": 7, "stem": "رات کو آسمان پر ", "options": ["ستارے چمکتے ہیں۔", "سورج چمکتا ہے۔", "بارش ہوتی ہے۔"], "answer_idx": 0, "translation": "At night stars shine in the sky."}
+{"id": 8, "stem": "استاد طالب علموں کو ", "options": ["پڑھاتا ہے۔", "کھلاتا ہے۔", "سلاتا ہے۔"], "answer_idx": 0, "translation": "The teacher teaches the students."}
+{"id": 9, "stem": "ڈاکٹر بیماروں کا ", "options": ["علاج کرتا ہے۔", "کھانا پکاتا ہے۔", "مکان بناتا ہے۔"], "answer_idx": 0, "translation": "The doctor treats the sick."}
+{"id": 10, "stem": "کسان کھیت میں فصل ", "options": ["اگاتا ہے۔", "بیچتا ہے۔", "پڑھتا ہے۔"], "answer_idx": 0, "translation": "The farmer grows crops in the field."}
+{"id": 11, "stem": "بچے صبح اسکول ", "options": ["جاتے ہیں۔", "کھاتے ہیں۔", "بناتے ہیں۔"], "answer_idx": 0, "translation": "The children go to school in the morning."}
+{"id": 12, "stem": "کتاب پڑھنے سے علم میں ", "options": ["اضافہ ہوتا ہے۔", "کمی ہوتی ہے۔", "درد ہوتا ہے۔"], "answer_idx": 0, "translation": "Reading books increases knowledge."}
+{"id": 13, "stem": "گرمیوں میں موسم بہت ", "options": ["گرم ہوتا ہے۔", "ٹھنڈا ہوتا ہے۔", "برفانی ہوتا ہے۔"], "answer_idx": 0, "translation": "In summer the weather is very hot."}
+{"id": 14, "stem": "سردیوں میں لوگ گرم کپڑے ", "options": ["پہنتے ہیں۔", "دھوتے ہیں۔", "پھینکتے ہیں۔"], "answer_idx": 0, "translation": "In winter people wear warm clothes."}
+{"id": 15, "stem": "درخت ہمیں سایہ اور ", "options": ["آکسیجن دیتے ہیں۔", "بجلی دیتے ہیں۔", "پیسے دیتے ہیں۔"], "answer_idx": 0, "translation": "Trees give us shade and oxygen."}
+{"id": 16, "stem": "چاند رات کو ", "options": ["نظر آتا ہے۔", "غائب رہتا ہے۔", "گرم ہوتا ہے۔"], "answer_idx": 0, "translation": "The moon appears at night."}
+{"id": 17, "stem": "شیر جنگل کا ", "options": ["بادشاہ کہلاتا ہے۔", "چوہا کہلاتا ہے۔", "پرندہ کہلاتا ہے۔"], "answer_idx": 0, "translation": "The lion is called the king of the jungle."}
+{"id": 18, "stem": "دودھ کا رنگ ", "options": ["سفید ہوتا ہے۔", "کالا ہوتا ہے۔", "نیلا ہوتا ہے۔"], "answer_idx": 0, "translation": "The colour of milk is white."}
+{"id": 19, "stem": "آگ بہت ", "options": ["گرم ہوتی ہے۔", "ٹھنڈی ہوتی ہے۔", "نرم ہوتی ہے۔"], "answer_idx": 0, "translation": "Fire is very hot."}
+{"id": 20, "stem": "قرآن مسلمانوں کی مقدس ", "options": ["کتاب ہے۔", "عمارت ہے۔", "زبان ہے۔"], "answer_idx": 0, "translation": "The Quran is the holy book of Muslims."}
+{"id": 21, "stem": "اردو پاکستان کی قومی ", "options": ["زبان ہے۔", "فصل ہے۔", "عمارت ہے۔"], "answer_idx": 0, "translation": "Urdu is the national language of Pakistan."}
+{"id": 22, "stem": "ہفتے میں سات ", "options": ["دن ہوتے ہیں۔", "مہینے ہوتے ہیں۔", "سال ہوتے ہیں۔"], "answer_idx": 0, "translation": "There are seven days in a week."}
+{"id": 23, "stem": "سال میں بارہ ", "options": ["مہینے ہوتے ہیں۔", "دن ہوتے ہیں۔", "ہفتے ہوتے ہیں۔"], "answer_idx": 0, "translation": "There are twelve months in a year."}
+{"id": 24, "stem": "انسان کے دو ", "options": ["ہاتھ ہوتے ہیں۔", "سر ہوتے ہیں۔", "دم ہوتے ہیں۔"], "answer_idx": 0, "translation": "A human has two hands."}
+{"id": 25, "stem": "بارش سے زمین ", "options": ["گیلی ہو جاتی ہے۔", "خشک ہو جاتی ہے۔", "جل جاتی ہے۔"], "answer_idx": 0, "translation": "Rain makes the ground wet."}
+{"id": 26, "stem": "چینی کا ذائقہ ", "options": ["میٹھا ہوتا ہے۔", "کڑوا ہوتا ہے۔", "کھٹا ہوتا ہے۔"], "answer_idx": 0, "translation": "Sugar tastes sweet."}
+{"id": 27, "stem": "لیموں کا ذائقہ ", "options": ["کھٹا ہوتا ہے۔", "میٹھا ہوتا ہے۔", "نمکین ہوتا ہے۔"], "answer_idx": 0, "translation": "Lemon tastes sour."}
+{"id": 28, "stem": "ریل گاڑی پٹری پر ", "options": ["چلتی ہے۔", "اڑتی ہے۔", "تیرتی ہے۔"], "answer_idx": 0, "translation": "The train runs on the track."}
+{"id": 29, "stem": "ہوائی جہاز آسمان میں ", "options": ["اڑتا ہے۔", "تیرتا ہے۔", "رینگتا ہے۔"], "answer_idx": 0, "translation": "The aeroplane flies in the sky."}
+{"id": 30, "stem": "کشتی دریا میں ", "options": ["تیرتی ہے۔", "اڑتی ہے۔", "دوڑتی ہے۔"], "answer_idx": 0, "translation": "The boat floats on the river."}
+{"id": 31, "stem": "شہد کو ", "options": ["مکھیاں بناتی ہیں۔", "چیونٹیاں بناتی ہیں۔", "مکڑیاں بناتی ہیں۔"], "answer_idx": 0, "translation": "Honey is made by bees."}
+{"id": 32, "stem": "گائے ہمیں ", "options": ["دودھ دیتی ہے۔", "انڈے دیتی ہے۔", "اون دیتی ہے۔"], "answer_idx": 0, "translation": "The cow gives us milk."}
+{"id": 33, "stem": "مرغی ", "options": ["انڈے دیتی ہے۔", "دودھ دیتی ہے۔", "شہد دیتی ہے۔"], "answer_idx": 0, "translation": "The hen lays eggs."}
+{"id": 34, "stem": "کھانا پکانے کے لیے ", "options": ["آگ چاہیے۔", "برف چاہیے۔", "کاغذ چاہیے۔"], "answer_idx": 0, "translation": "Fire is needed to cook food."}
+{"id": 35, "stem": "رات کے بعد ", "options": ["دن آتا ہے۔", "رات آتی ہے۔", "شام رہتی ہے۔"], "answer_idx": 0, "translation": "After night comes day."}
+{"id": 36, "stem": "بیمار ہونے پر ہم ", "options": ["دوا کھاتے ہیں۔", "کھیل کھیلتے ہیں۔", "گانا گاتے ہیں۔"], "answer_idx": 0, "translation": "When sick we take medicine."}
+{"id": 37, "stem": "کھیلوں میں کرکٹ پاکستان میں بہت ", "options": ["مقبول ہے۔", "ناپسندیدہ ہے۔", "مہنگی ہے۔"], "answer_idx": 0, "translation": "Cricket is very popular in Pakistan."}
+{"id": 38, "stem": "دن میں روشنی سورج سے ", "options": ["ملتی ہے۔", "چھپتی ہے۔", "رکتی ہے۔"], "answer_idx": 0, "translation": "During the day light comes from the sun."}
+{"id": 39, "stem": "سچ بولنا ایک اچھی ", "options": ["عادت ہے۔", "بیماری ہے۔", "سزا ہے۔"], "answer_idx": 0, "translation": "Speaking the truth is a good habit."}
+{"id": 40, "stem": "محنت کرنے سے کامیابی ", "options": ["ملتی ہے۔", "جاتی ہے۔", "رکتی ہے۔"], "answer_idx": 0, "translation": "Hard work brings success."}
+{"id": 41, "stem": "دریائے سندھ پاکستان کا سب سے بڑا ", "options": ["دریا ہے۔", "پہاڑ ہے۔", "شہر ہے۔"], "answer_idx": 0, "translation": "The Indus is the largest river of Pakistan."}
+{"id": 42, "stem": "ماں اپنے بچے سے بہت ", "options": ["پیار کرتی ہے۔", "نفرت کرتی ہے۔", "ڈرتی ہے۔"], "answer_idx": 0, "translation": "A mother loves her child very much."}
+{"id": 43, "stem": "کتاب میں الفاظ اور ", "options": ["صفحے ہوتے ہیں۔", "پہیے ہوتے ہیں۔", "پتے ہوتے ہیں۔"], "answer_idx": 0, "translation": "A book has words and pages."}
+{"id": 44, "stem": "گھڑی وقت ", "options": ["بتاتی ہے۔", "کھاتی ہے۔", "پکاتی ہے۔"], "answer_idx": 0, "translation": "A clock tells the time."}
+{"id": 45, "stem": "نمک کا ذائقہ ", "options": ["نمکین ہوتا ہے۔", "میٹھا ہوتا ہے۔", "کھٹا ہوتا ہے۔"], "answer_idx": 0, "translation": "Salt tastes salty."}

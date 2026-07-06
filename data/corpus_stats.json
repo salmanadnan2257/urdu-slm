@@ -1,0 +1,38 @@
+{
+  "extract": {
+    "per_source": {
+      "wikipedia": {
+        "raw_docs": 1728010,
+        "kept_paragraphs": 2459293,
+        "chars": 370153408
+      },
+      "leipzig_newscrawl_2016": {
+        "raw_docs": 1000000,
+        "kept_paragraphs": 960189,
+        "chars": 122734084
+      },
+      "leipzig_newscrawl_2011": {
+        "raw_docs": 300000,
+        "kept_paragraphs": 276005,
+        "chars": 32169822
+      }
+    }
+  },
+  "dedup": {
+    "input": 3695487,
+    "kept": 2515082,
+    "dropped_exact": 871272,
+    "dropped_near": 309133,
+    "dedup_rate": 0.3194,
+    "kept_chars": 438458868
+  },
+  "split": {
+    "train_docs": 2489976,
+    "val_docs": 25106,
+    "per_source": {
+      "leipzig_newscrawl_2011": 274799,
+      "leipzig_newscrawl_2016": 930452,
+      "wikipedia": 1309831
+    }
+  }
+}

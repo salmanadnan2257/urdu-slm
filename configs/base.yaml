@@ -1,0 +1,27 @@
+# Base preset (~124M). Phase-2 GPU target. See docs/GPU_RUN.md for launch steps.
+# Token budget reasoning is written out in docs/GPU_RUN.md (Chinchilla-style).
+preset: base
+vocab_size: 32000
+data_dir: data
+out_dir: runs/base
+
+block_size: 1024
+batch_size: 32
+grad_accum: 16         # effective ~524k tokens/step on a single 24GB GPU
+
+# ~450M tokens = ~4 epochs of the 111.7M-token corpus. The corpus is data-limited
+# (0.9 tokens/param), so this is a repeat-bounded budget, not Chinchilla-optimal.
+# See docs/GPU_RUN.md for the full reasoning. Raise this only after adding data.
+max_tokens: 450000000
+warmup_steps: 1000
+lr: 0.0003
+min_lr: 0.00003
+beta2: 0.95
+weight_decay: 0.1
+grad_clip: 1.0
+
+seed: 1337
+log_interval: 20
+eval_interval: 1000
+eval_iters: 200
+ckpt_interval: 2000

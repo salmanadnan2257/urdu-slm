@@ -1,0 +1,18 @@
+# Core. On a GPU box, install torch from the CUDA index instead of CPU wheels:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu124
+torch==2.12.1
+tokenizers==0.23.1
+numpy==2.5.1
+
+# Data pipeline
+mwparserfromhell==0.7.2   # MediaWiki wikitext parsing
+datasketch==2.0.0         # MinHash LSH near-dedup
+xxhash==3.8.1             # fast deterministic shingle hashing for MinHash
+
+# Training / eval
+PyYAML==6.0.3
+matplotlib==3.11.0        # loss-curve plot
+tqdm==4.68.3
+
+# Tests
+pytest==9.1.1
