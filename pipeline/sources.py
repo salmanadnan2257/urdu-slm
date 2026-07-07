@@ -1,14 +1,19 @@
 """Source readers. Each yields raw document dicts {text, source, id/title}.
 
-Two sources are wired up, both downloadable without authentication:
+Three sources are wired up, all downloadable without authentication:
 
   * wiki    : a MediaWiki XML dump (bz2) of Urdu Wikipedia. Wikitext is stripped
               with mwparserfromhell.
   * leipzig : Wortschatz Leipzig sentence corpora (tar.gz), one sentence per
               tab-separated line in `*-sentences.txt`.
+  * plain   : a plain-text corpus file, optionally .xz or .gz compressed, in the
+              CC-100 layout: consecutive non-empty lines form one document and a
+              blank line ends it.
 """
 
 import bz2
+import gzip
+import lzma
 import re
 import tarfile
 import xml.etree.ElementTree as ET
@@ -61,6 +66,33 @@ def _strip_wikitext(wikitext):
             continue
         lines.append(line)
     return "\n".join(lines)
+
+
+def read_plain_text(path, corpus_name, max_docs=None):
+    """Stream documents from a plain-text file (CC-100 layout, see module doc)."""
+    p = str(path)
+    if p.endswith(".xz"):
+        fh = lzma.open(p, "rt", encoding="utf-8", errors="ignore")
+    elif p.endswith(".gz"):
+        fh = gzip.open(p, "rt", encoding="utf-8", errors="ignore")
+    else:
+        fh = open(p, "r", encoding="utf-8", errors="ignore")
+    n = 0
+    doc_lines = []
+    with fh:
+        for line in fh:
+            line = line.strip()
+            if line:
+                doc_lines.append(line)
+                continue
+            if doc_lines:
+                yield {"text": "\n".join(doc_lines), "source": corpus_name}
+                doc_lines = []
+                n += 1
+                if max_docs and n >= max_docs:
+                    return
+        if doc_lines:
+            yield {"text": "\n".join(doc_lines), "source": corpus_name}
 
 
 def read_leipzig_tar(path, corpus_name, max_docs=None):

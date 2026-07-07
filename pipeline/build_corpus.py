@@ -23,7 +23,7 @@ from pathlib import Path
 from .common import ShardWriter, Stage, iter_jsonl, human
 from .dedup import Deduper
 from .normalize import normalize, keep_line
-from .sources import read_wiki_dump, read_leipzig_tar
+from .sources import read_wiki_dump, read_leipzig_tar, read_plain_text
 
 
 def _paragraphs(text):
@@ -68,6 +68,10 @@ def stage_extract(args, work):
         fname, name = spec.split(":", 1)
         run_source(name, read_leipzig_tar(Path(args.raw_dir) / fname, name,
                                           max_docs=args.limit_docs or None))
+    for spec in args.plain:
+        fname, name = spec.split(":", 1)
+        run_source(name, read_plain_text(Path(args.raw_dir) / fname, name,
+                                         max_docs=args.limit_docs or None))
 
     stats = {"per_source": per_source}
     stage.mark_done(stats)
@@ -135,6 +139,8 @@ def main():
     ap.add_argument("--wiki", default=None, help="wiki dump filename in raw-dir")
     ap.add_argument("--leipzig", action="append", default=[],
                     help="leipzig spec 'file.tar.gz:source_name' (repeatable)")
+    ap.add_argument("--plain", action="append", default=[],
+                    help="plain-text spec 'file[.xz|.gz]:source_name' (repeatable)")
     ap.add_argument("--near-threshold", type=float, default=0.8)
     ap.add_argument("--val-frac", type=float, default=0.01)
     ap.add_argument("--limit-docs", type=int, default=0, help="cap raw docs per source (0=all)")

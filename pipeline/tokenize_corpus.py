@@ -15,16 +15,20 @@ from tokenizers import Tokenizer
 from .common import iter_jsonl, human
 
 
-def encode_split(tok, shard_dir, out_path, eot_id):
+def encode_split(tok, shard_dir, out_path, eot_id, upsample=None, only=None):
     shards = sorted(Path(shard_dir).glob("*.jsonl"))
     total = 0
     with open(out_path, "wb") as fh:
         for shard in shards:
             buf = []
             for rec in iter_jsonl(shard):
+                src = rec.get("source")
+                if only and src not in only:
+                    continue
                 ids = tok.encode(rec["text"]).ids
                 ids.append(eot_id)
-                buf.extend(ids)
+                reps = upsample.get(src, 1) if upsample else 1
+                buf.extend(ids * reps)
             arr = np.array(buf, dtype=np.uint16)
             arr.tofile(fh)
             total += len(arr)
@@ -34,16 +38,34 @@ def encode_split(tok, shard_dir, out_path, eot_id):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data-dir", default="data")
+    ap.add_argument("--out-dir", default=None, help="where to write .bin files (default: data-dir)")
     ap.add_argument("--tokenizer", default="tokenizer/tokenizer.json")
+    ap.add_argument("--upsample", action="append", default=[],
+                    help="repeat a source's docs in train.bin, spec 'source:k' (repeatable); "
+                         "val.bin is never upsampled")
+    ap.add_argument("--filter-source", default=None,
+                    help="comma list of sources to keep in train.bin (default: all); "
+                         "val.bin is never filtered")
     args = ap.parse_args()
 
     tok = Tokenizer.from_file(args.tokenizer)
     eot_id = tok.token_to_id("<|endoftext|>")
     data = Path(args.data_dir)
+    out = Path(args.out_dir) if args.out_dir else data
+    out.mkdir(parents=True, exist_ok=True)
+
+    upsample = {}
+    for spec in args.upsample:
+        src, k = spec.rsplit(":", 1)
+        upsample[src] = int(k)
+    only = set(args.filter_source.split(",")) if args.filter_source else None
 
     for split in ["train", "val"]:
-        n = encode_split(tok, data / split, data / f"{split}.bin", eot_id)
-        print(f"{split}: {human(n)} tokens -> {data/f'{split}.bin'}")
+        train = split == "train"
+        n = encode_split(tok, data / split, out / f"{split}.bin", eot_id,
+                         upsample=upsample if train else None,
+                         only=only if train else None)
+        print(f"{split}: {human(n)} tokens -> {out/f'{split}.bin'}")
 
 
 if __name__ == "__main__":

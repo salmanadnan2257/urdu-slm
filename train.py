@@ -118,6 +118,7 @@ def main():
     ap.add_argument("--out-dir", default=None)
     ap.add_argument("--resume", action="store_true")
     ap.add_argument("--max-tokens", type=int, default=None, help="override token budget")
+    ap.add_argument("--data-dir", default=None, help="override data directory")
     args = ap.parse_args()
 
     with open(args.config) as f:
@@ -126,6 +127,8 @@ def main():
         cfg["out_dir"] = args.out_dir
     if args.max_tokens:
         cfg["max_tokens"] = args.max_tokens
+    if args.data_dir:
+        cfg["data_dir"] = args.data_dir
 
     rank, local_rank, world_size = setup_ddp()
     master = rank == 0
