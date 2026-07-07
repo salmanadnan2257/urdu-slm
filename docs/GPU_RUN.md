@@ -99,3 +99,65 @@ python -m eval.script_mix   --ckpt runs/base/ckpt.pt
 python -m eval.cloze        --ckpt runs/base/ckpt.pt --shots 2
 python sample.py            --ckpt runs/base/ckpt.pt
 ```
+
+## Real run log (RunPod, A100 SXM 80GB, 2026-07-06)
+
+The A100 PCIe tier was out of capacity at signup time; A100 SXM was used instead,
+same 80GB VRAM, $1.49/hr instead of $1.39/hr, no meaningful cost difference.
+
+SSH key setup: the account-level public key RunPod asks for is only injected into
+a pod's `authorized_keys` at creation time. If you add the key after the pod is
+already up, a plain reconnect or even a Stop/Start cycle may not pick it up. The
+reliable fix: open the pod's **Web Terminal** and run this once, using your own
+public key:
+```bash
+mkdir -p ~/.ssh && echo "<your ssh-ed25519 public key line>" >> ~/.ssh/authorized_keys \
+  && chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys
+```
+Use the **"SSH over exposed TCP"** connection string from the Connect tab (the
+`ssh root@<ip> -p <port>` form), not the proxied `ssh <pod-id>@ssh.runpod.io` one;
+only the direct-TCP form supports SCP/SFTP, which rsync needs.
+
+A local SSH config alias makes every later command shorter and works for
+`ssh`/`scp`/`rsync` alike:
+```
+# ~/.ssh/config
+Host runpod-urdu
+    HostName <pod-ip>
+    Port <pod-ssh-port>
+    User root
+    IdentityFile ~/.ssh/id_ed25519
+    StrictHostKeyChecking accept-new
+```
+
+Transfer (data/ and tokenizer/ are already built locally, no need to rebuild on
+the pod):
+```bash
+rsync -avz --progress -e ssh ./ runpod-urdu:/workspace/urdu-slm/
+```
+
+The RunPod PyTorch template ships a working CUDA-enabled torch already
+(verified: 2.8.0+cu128 here). Installing this repo's pinned `torch==2.12.1` from
+PyPI would silently replace it with a CPU-only build, so install everything
+except torch:
+```bash
+grep -viE '^torch' requirements.txt > /tmp/reqs_no_torch.txt
+pip install --break-system-packages -r /tmp/reqs_no_torch.txt
+python3 -c "import torch; print(torch.cuda.is_available())"   # must print True
+```
+(`--break-system-packages` is fine on a disposable single-purpose pod; the
+"externally-managed-environment" guard otherwise blocks a plain `pip install`.)
+
+Run detached so it survives an SSH disconnect over the multi-hour run:
+```bash
+tmux new-session -d -s training \
+  'python3 train.py --config configs/base.yaml 2>&1 | tee train_run.log'
+# reattach any time with: tmux attach -t training
+```
+
+**Stopping and cost control**: SSH access only reaches the guest OS. It cannot
+stop RunPod's billing meter, that is an account-level action. Once training
+finishes (or you want to stop early), pull the checkpoint back, then go to the
+RunPod dashboard and click **Terminate** on the pod (not just Stop, which still
+bills for the reserved disk/GPU allocation). There is no way to do this step
+from inside the pod over SSH.
