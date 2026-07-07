@@ -13,3 +13,6 @@ htmlcov/
 .DS_Store
 *.log
 .env
+# Exceeds GitHub's 100MB per-file limit; regenerate via pipeline.tokenize_corpus
+# (see README "Reproduce the corpus"). val.bin (2.2MB) stays committed.
+data/train.bin
