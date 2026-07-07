@@ -268,6 +268,7 @@ filtering, and exact + near dedup.
   (embedded English) directly. Writing the filter test surfaced an off-by-count
   bug in my own expectation ("اردو and english" is 4 Arabic of 16 letters =
   0.25, not the 0.5 I first assumed), which the test now pins.
+- **Writing the exhaustive project documentation honestly.** The first documentation attempt stalled and had to be rerun. A more fundamental problem showed up on the retry: pdflatex cannot shape right-to-left Perso-Arabic script, so the real Urdu-script sample generations in the README couldn't be reproduced directly in the PDF. The fix was to paraphrase them in English inside the document with an explicit pointer back to the real README for the native text, rather than silently dropping them or rendering broken glyphs.
 
 ## What I learned
 
