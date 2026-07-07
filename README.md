@@ -228,9 +228,54 @@ filtering, and exact + near dedup.
 - Phase 1 (this repo): **done and verified here.** Real corpus built, tokenizer
   trained, tests passing, tiny model trained on CPU with a decreasing loss curve
   and saved checkpoint.
-- Phase 2 (base model): **not trained yet.** The ~124M `base` run is a budget
-  decision, not an engineering one; `docs/GPU_RUN.md` has the one command, cost
-  estimate, and token-budget reasoning. No base weights are claimed or shipped.
+- Phase 2 (base model): **trained, 2026-07-07, on a rented A100 SXM 80GB.**
+  All 858 steps (449.8M tokens, ~4 epochs of the corpus) completed in about
+  75 minutes at a real, sustained ~99,470 tokens/second, roughly 3x the
+  conservative estimate the budget was based on. Actual cost: about $1.90,
+  well under the original $6 estimate. Loss fell cleanly the whole run:
+  7.35 to 3.51 (last logged step, 840 of 858). See `docs/GPU_RUN.md` for the
+  exact commands used and the real per-step log.
+- The trained weights (`runs/base/ckpt.pt`, 1.48GB, and `runs/base/model.pt`,
+  495MB) are not in this repo, both exceed GitHub's 100MB per-file limit, the
+  same reason `data/train.bin` is excluded. `runs/base/metrics.jsonl`, the real
+  per-step training log, is committed. Regenerate the weights with the same
+  command in `docs/GPU_RUN.md`, or ask for a copy of the trained checkpoint
+  directly.
+
+### Base model evaluation (real numbers, run on this repo's `eval/` scripts)
+
+| Metric | Result |
+|---|---|
+| Held-out perplexity (`data/val.bin`, 1,118,208 tokens) | 38.02 |
+| Script mix (20 generations) | 99.43% Arabic script, 0.57% Latin, 0% other |
+| Cloze accuracy (2-shot, 43 items) | 34.9% (chance is 33.3%) |
+
+Read honestly: script mix confirms the model reliably generates in Urdu's
+actual writing system, not garbage output. Perplexity and cloze accuracy are
+modest, cloze sits barely above chance, which is the expected result for a
+124M-parameter model trained on a data-limited corpus (0.9 tokens per
+parameter against Chinchilla's ~20) for one short run, not a claim of strong
+language understanding.
+
+Three real sample generations (`python sample.py --ckpt runs/base/ckpt.pt`),
+shown as evidence, not cherry-picked for quality:
+
+- Prompt "پاکستان ایک" (Pakistan a/one): continues into cricket-trivia
+  fragments (a one-day international, a captaincy reference, "his father's
+  wedding"), grammatically real Urdu phrases but topically disconnected and
+  repetitive in places, a Wikipedia-flavored corpus showing through.
+- Prompt "اردو زبان" (Urdu language): falls into a real failure mode, a
+  repetition loop ("Iran, Iran, Iran...") before recovering into a coherent
+  sentence about a village in Iran's Golestan province. Shown because it is
+  representative, not because it is flattering.
+- Prompt "آج موسم" (today's weather): produces fluent Urdu sentences about
+  Islamabad and a diplomatic meeting, again ignoring the prompt's actual topic
+  in favor of whatever is statistically common in the corpus.
+
+The honest summary: the model has clearly learned Urdu script, vocabulary, and
+local grammar from a small, data-limited corpus, but not topical coherence or
+prompt-following, which would need either a much larger corpus (see "What I'd
+do differently") or an instruction-tuning pass this project does not attempt.
 
 ## Challenges
 

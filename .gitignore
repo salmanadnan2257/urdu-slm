@@ -16,3 +16,9 @@ htmlcov/
 # Exceeds GitHub's 100MB per-file limit; regenerate via pipeline.tokenize_corpus
 # (see README "Reproduce the corpus"). val.bin (2.2MB) stays committed.
 data/train.bin
+# Base checkpoint/weights (1.48GB / 495MB): also exceed GitHub's 100MB limit.
+# metrics.jsonl (the real per-step training log) stays committed. Regenerate
+# the weights with docs/GPU_RUN.md's one-command launch; runs/tiny/model.pt
+# (50MB) stays committed since it fits under the limit.
+runs/base/ckpt.pt
+runs/base/model.pt
