@@ -283,13 +283,16 @@ filtering, and exact + near dedup.
   ~2.74 (rose briefly and expectedly at the phase-1 → anneal data-source
   switch, then settled). Held-out val perplexity during training: 52.57 at
   step 1000 (524M tokens) down to 27.31 at step 4000 (2.10B tokens).
-- Neither run's weights are in this repo: `runs/base/{ckpt.pt,model.pt}`
-  (1.48GB/495MB) and `runs/base_v2/{ckpt.pt,model.pt}` (1.48GB/495MB) all
-  exceed GitHub's 100MB per-file limit, the same reason `data/train.bin` is
-  excluded. Both runs' `metrics.jsonl` (the real per-step training logs) are
-  committed. Regenerate either run's weights with the corresponding config in
-  `docs/GPU_RUN.md` / the v2 commands above, or ask for a copy of the trained
-  checkpoint directly.
+- Both runs' full weights are in this repo via **Git LFS**:
+  `runs/base/{ckpt.pt,model.pt}` (1.48GB/495MB) and
+  `runs/base_v2/{ckpt.pt,model.pt}` (1.48GB/495MB), each exceeds GitHub's
+  100MB per-file limit for a normal commit, the same reason `data/train.bin`
+  is gitignored instead. `git clone` pulls the LFS objects automatically if
+  Git LFS is installed (`git lfs install` once, globally); otherwise run
+  `git lfs pull` after cloning. Both runs' `metrics.jsonl` (the real per-step
+  training logs) are committed normally. A smaller, inference-only packaged
+  build of `runs/base_v2/model.pt` (tokenizer, model code, `sample.py`,
+  no optimizer state) is also available as a GitHub Release asset.
 
 ### Base model evaluation (real numbers, run on this repo's `eval/` scripts)
 
