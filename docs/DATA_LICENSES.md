@@ -36,19 +36,31 @@ was verified reachable from this machine on 2026-07-06.
   fully permissive corpus is required, retrain the tokenizer and model on the
   Wikipedia subset alone (the pipeline supports dropping sources).
 
+## 3. CC-100 (Urdu), used from the v2 corpus (2026-07-08) onward
+
+- URL: https://data.statmt.org/cc-100/ur.txt.xz
+- Size: ~884 MB compressed (xz).
+- License: "No claims of intellectual property are made on the work of
+  preparation of the corpus" by CC-100's preparers; users are bound by the
+  Common Crawl Foundation's terms of use
+  (https://commoncrawl.org/terms-of-use), since the corpus is a filtered
+  extract of Common Crawl. Not a standard open-content license (no CC BY/SA
+  label), but openly and freely redistributable for research use.
+- Use here: plain-text, blank-line-delimited documents, read directly by
+  `pipeline.sources.read_plain_text` (handles `.xz`/`.gz`/plain), normalized
+  and filtered the same as the other sources.
+- Not used in the v1 (2026-07-06) corpus, skipped then to keep the download
+  modest and the first proof run fast.
+
 ## Sources considered and skipped
 
-- CC-100 (ur) from data.statmt.org: openly downloadable, CC-BY-like terms
-  derived from CommonCrawl. Skipped for the phase-1 build only to keep the
-  download modest and the proof run fast; the pipeline can ingest it by pointing
-  `read_leipzig_tar`-style readers at a plain-text source. Not used here, so not
-  claimed in the corpus numbers.
 - OSCAR / mC4 Urdu: gated behind Hugging Face auth or a click-through, so
   excluded per the no-auth rule.
 
 ## Regeneration
 
 Raw downloads are kept out of the repository (they live in a scratch directory
-during the build and are deleted afterward). To rebuild the corpus, download the
-three URLs above into a directory and run the command in the top-level README
-under "Reproduce the corpus".
+during the build and are deleted afterward). To rebuild the v2 corpus, download
+all four URLs above into a directory and run the command in the top-level
+README under "Reproduce the corpus"; drop the CC-100 file and the upsample
+flags to rebuild the smaller v1 corpus instead.

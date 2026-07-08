@@ -4,9 +4,11 @@ A small Urdu language model trained from scratch: the full stack, from raw
 public text to a decoder-only transformer, built for a low-resource language
 that off-the-shelf tokenizers and models handle poorly.
 
-This repository is **phase 1**: the complete, verified pipeline plus a tiny
-proof-run trained here on CPU. **Phase 2** (the real ~124M-parameter model) is a
-one-command GPU launch that has not been run yet; see the status section.
+This repository covers the full stack: a verified pipeline, a tiny CPU proof-run,
+and two real GPU training runs of the 124M-parameter model. The second run
+(2026-07-08) expanded the corpus roughly 8x with CC-100 Urdu and upsampled
+Wikipedia, closing much of the perplexity gap the first run left open. See the
+status section for real, honestly-reported numbers from both.
 
 Why build it: most "train a GPT" projects reach for English data and a
 pretrained tokenizer. Urdu (Perso-Arabic script, right-to-left, rich morphology)
@@ -69,8 +71,9 @@ hidden by shrinking the vocab.
 
 ## Corpus (real numbers from this machine)
 
-Built 2026-07-06 from two no-auth public sources (licenses in
-`docs/DATA_LICENSES.md`):
+### v1 corpus (used for the first base run, 2026-07-06)
+
+Built from two no-auth public sources (licenses in `docs/DATA_LICENSES.md`):
 
 | source | raw units | kept (post-filter) | kept after dedup | chars |
 | ------ | --------- | ------------------ | ---------------- | ----- |
@@ -82,13 +85,42 @@ Built 2026-07-06 from two no-auth public sources (licenses in
 Filtering (NFC normalization, script-range language ID at 0.65 Arabic ratio,
 min 40 chars / 6 words, boilerplate drop) then exact + near dedup removed
 **31.9%** of the extracted paragraphs (871,272 exact duplicates + 309,133
-MinHash near-duplicates). Urdu Wikipedia's large population of bot-generated stub
-articles is the main reason the dedup rate is that high. Final split:
-**2,489,976 train** docs / **25,106 val** docs (deterministic 1% holdout).
+MinHash near-duplicates). Final split: **2,489,976 train** docs / **25,106
+val** docs (deterministic 1% holdout). Cleaned token stream: **111.7M train
+tokens** + 1.1M val tokens = 112.8M total, ~0.9 tokens per `base` parameter.
 
-Cleaned token stream (after 32k BPE tokenization): **111.7M train tokens** +
-1.1M val tokens = 112.8M total. That is ~0.9 tokens per `base` parameter, which
-drives the honest token-budget discussion in `docs/GPU_RUN.md`.
+### v2 corpus (used for the second base run, 2026-07-08)
+
+Added CC-100 Urdu (`data.statmt.org/cc-100/ur.txt.xz`, plain-text Common Crawl
+extract, license and rationale in `docs/DATA_LICENSES.md`) and refetched a
+newer Urdu Wikipedia dump, on the same pipeline plus a new `read_plain_text`
+source reader (`pipeline/sources.py`) and an upsample/filter option in
+`pipeline/tokenize_corpus.py`:
+
+| source | raw units | kept (post-filter) | chars |
+| ------ | --------- | ------------------ | ----- |
+| CC-100 Urdu | ~9.4M docs | 11,038,199 | majority of corpus by volume |
+| Urdu Wikipedia (newer dump) | 1.7M+ articles | 1,232,975 | n/a |
+| Leipzig newscrawl 2016 | 1,000,000 sentences | 909,729 | n/a |
+| Leipzig newscrawl 2011 | 300,000 sentences | 272,596 | n/a |
+
+Exact + near dedup removed **37.5%** of extracted paragraphs, higher than v1
+because CC-100 has real overlap with itself and with Wikipedia. Final split:
+**13.3M train** docs / **134.5K val** docs.
+
+Two tokenized outputs came out of this corpus:
+
+- `data/train.bin`: the main mix, **with Wikipedia upsampled 3x** (repeated
+  during tokenization, not in the raw corpus) so a comparatively small
+  high-quality source is not swamped by CC-100's volume. **862.4M train
+  tokens** + 7.3M val tokens.
+- `data_anneal/train.bin`: a **Wikipedia-only** slice (`--filter-source
+  wikipedia`) used for a short annealing phase at the end of training.
+  **70.8M train tokens** + 7.3M val tokens.
+
+This gives the v2 run **~7.7x more unique training tokens** than v1, and puts
+the token/parameter ratio at 2.5B / 123.7M params ≈ 20.2, right at the
+Chinchilla-optimal ~20 the v1 corpus fell well short of (0.9 tokens/param).
 
 ## Tokenizer compression (measured)
 
@@ -193,19 +225,28 @@ mkdir -p $URDU_SLM_RAW_DIR && cd $URDU_SLM_RAW_DIR
 curl -LO https://dumps.wikimedia.org/urwiki/latest/urwiki-latest-pages-articles.xml.bz2
 curl -LO https://downloads.wortschatz-leipzig.de/corpora/urd_newscrawl_2016_1M.tar.gz
 curl -LO https://downloads.wortschatz-leipzig.de/corpora/urd_newscrawl_2011_300K.tar.gz
+curl -LO https://data.statmt.org/cc-100/ur.txt.xz   # v2 only
 ```
 
-The `data/` directory in this repo holds `val.bin` (2.2MB) and `corpus_stats.json`,
-but not `train.bin`: at 214MB it exceeds GitHub's 100MB per-file limit, so it is
-gitignored rather than committed. Regenerate it locally with:
+The `data/` directory in this repo holds `val.bin` and `corpus_stats.json`, but
+not `train.bin`: both the v1 (214MB) and v2 (1.7GB) versions exceed GitHub's
+100MB per-file limit, so it is gitignored rather than committed. Regenerate the
+v2 corpus (recommended, this is what `runs/base_v2` was trained on) with:
 
 ```bash
 python -m pipeline.build_corpus --raw-dir $URDU_SLM_RAW_DIR --out-dir data \
     --wiki urwiki-latest-pages-articles.xml.bz2 \
     --leipzig urd_newscrawl_2016_1M.tar.gz:leipzig_newscrawl_2016 \
-    --leipzig urd_newscrawl_2011_300K.tar.gz:leipzig_newscrawl_2011
-python -m pipeline.tokenize_corpus --data-dir data --tokenizer tokenizer/tokenizer.json
+    --leipzig urd_newscrawl_2011_300K.tar.gz:leipzig_newscrawl_2011 \
+    --plain ur.txt.xz:cc100
+python -m pipeline.tokenize_corpus --data-dir data --tokenizer tokenizer/tokenizer.json \
+    --upsample wikipedia:3
+python -m pipeline.tokenize_corpus --data-dir data --out-dir data_anneal \
+    --tokenizer tokenizer/tokenizer.json --filter-source wikipedia
 ```
+
+Drop `--plain ur.txt.xz:cc100` and the two `pipeline.tokenize_corpus` flags to
+reproduce the smaller v1 corpus instead.
 
 A single sample shard is kept under `data/sample/` for inspection without needing
 the full corpus.
@@ -228,54 +269,77 @@ filtering, and exact + near dedup.
 - Phase 1 (this repo): **done and verified here.** Real corpus built, tokenizer
   trained, tests passing, tiny model trained on CPU with a decreasing loss curve
   and saved checkpoint.
-- Phase 2 (base model): **trained, 2026-07-07, on a rented A100 SXM 80GB.**
-  All 858 steps (449.8M tokens, ~4 epochs of the corpus) completed in about
-  75 minutes at a real, sustained ~99,470 tokens/second, roughly 3x the
-  conservative estimate the budget was based on. Actual cost: about $1.90,
-  well under the original $6 estimate. Loss fell cleanly the whole run:
-  7.35 to 3.51 (last logged step, 840 of 858). See `docs/GPU_RUN.md` for the
-  exact commands used and the real per-step log.
-- The trained weights (`runs/base/ckpt.pt`, 1.48GB, and `runs/base/model.pt`,
-  495MB) are not in this repo, both exceed GitHub's 100MB per-file limit, the
-  same reason `data/train.bin` is excluded. `runs/base/metrics.jsonl`, the real
-  per-step training log, is committed. Regenerate the weights with the same
-  command in `docs/GPU_RUN.md`, or ask for a copy of the trained checkpoint
-  directly.
+- Base run v1: **trained, 2026-07-07, on a rented A100 SXM 80GB.** All 858
+  steps (449.8M tokens, ~4 epochs of the v1 corpus) completed in about 75
+  minutes at a real, sustained ~99,470 tokens/second. Actual cost: about
+  $1.90. Loss fell 7.35 to 3.51. See `docs/GPU_RUN.md` for the exact commands
+  and the real per-step log. Superseded by v2 below; kept for the historical
+  comparison.
+- **Base run v2 (current best): trained, 2026-07-08, on a rented A100 SXM
+  80GB.** 4,768 steps, **2,499,805,184 tokens** (2.4B on the CC-100 +
+  3x-upsampled-Wikipedia mix, then a ~100M-token anneal on Wikipedia-only
+  data), real sustained throughput ~105,000-105,300 tokens/second, **6h 39m**
+  of GPU time, **actual cost ≈ $13.06**. Train loss fell 9.63 to a final
+  ~2.74 (rose briefly and expectedly at the phase-1 → anneal data-source
+  switch, then settled). Held-out val perplexity during training: 52.57 at
+  step 1000 (524M tokens) down to 27.31 at step 4000 (2.10B tokens).
+- Neither run's weights are in this repo: `runs/base/{ckpt.pt,model.pt}`
+  (1.48GB/495MB) and `runs/base_v2/{ckpt.pt,model.pt}` (1.48GB/495MB) all
+  exceed GitHub's 100MB per-file limit, the same reason `data/train.bin` is
+  excluded. Both runs' `metrics.jsonl` (the real per-step training logs) are
+  committed. Regenerate either run's weights with the corresponding config in
+  `docs/GPU_RUN.md` / the v2 commands above, or ask for a copy of the trained
+  checkpoint directly.
 
 ### Base model evaluation (real numbers, run on this repo's `eval/` scripts)
 
-| Metric | Result |
-|---|---|
-| Held-out perplexity (`data/val.bin`, 1,118,208 tokens) | 38.02 |
-| Script mix (20 generations) | 99.43% Arabic script, 0.57% Latin, 0% other |
-| Cloze accuracy (2-shot, 43 items) | 34.9% (chance is 33.3%) |
+| Metric | v1 (2026-07-07) | **v2 (2026-07-08)** |
+|---|---|---|
+| Held-out perplexity | 38.02 | **28.93** |
+| Script mix (Arabic script) | 99.43% (20 generations) | **99.75%** (50 generations) |
+| Cloze accuracy (2-shot) | 34.9% (15/43, chance 33.3%) | **39.5%** (17/43, chance 33.3%) |
 
-Read honestly: script mix confirms the model reliably generates in Urdu's
-actual writing system, not garbage output. Perplexity and cloze accuracy are
-modest, cloze sits barely above chance, which is the expected result for a
-124M-parameter model trained on a data-limited corpus (0.9 tokens per
-parameter against Chinchilla's ~20) for one short run, not a claim of strong
-language understanding.
+Read honestly, including the caveat that matters most: the cloze harness is
+**45 items (43 scored)**, so its standard error at this sample size is roughly
+±7 percentage points. The 34.9% → 39.5% move is a 2-item difference and sits
+comfortably inside that noise band, it is not a number I can call a real
+improvement. The perplexity gain (38.02 → 28.93, a genuine ~24% reduction) is
+real and expected: ~7.7x more unique tokens and a token/parameter ratio much
+closer to Chinchilla-optimal directly improves general language modeling.
+Why cloze barely moved despite that: a 124M-parameter model has a real,
+literature-supported ceiling on how many discrete facts it can store
+regardless of how much prose it reads (Roberts et al., 2020, "How Much
+Knowledge Can You Pack Into the Parameters of a Language Model?"; storage
+capacity scales with parameter count, not primarily with training-text
+volume). More text made the model more fluent; it did not meaningfully raise
+how many facts it can recall. The two most evidence-backed next levers are a
+larger model (more parameters, more fact-storage capacity) and training data
+built specifically as declarative fact statements (e.g. from Wikidata
+triples), not just more general prose; see "What I'd do differently".
 
-Three real sample generations (`python sample.py --ckpt runs/base/ckpt.pt`),
-shown as evidence, not cherry-picked for quality:
+Three real sample generations from v2
+(`python sample.py --ckpt runs/base_v2/model.pt`), shown as evidence, not
+cherry-picked for quality:
 
-- Prompt "پاکستان ایک" (Pakistan a/one): continues into cricket-trivia
-  fragments (a one-day international, a captaincy reference, "his father's
-  wedding"), grammatically real Urdu phrases but topically disconnected and
-  repetitive in places, a Wikipedia-flavored corpus showing through.
-- Prompt "اردو زبان" (Urdu language): falls into a real failure mode, a
-  repetition loop ("Iran, Iran, Iran...") before recovering into a coherent
-  sentence about a village in Iran's Golestan province. Shown because it is
-  representative, not because it is flattering.
-- Prompt "آج موسم" (today's weather): produces fluent Urdu sentences about
-  Islamabad and a diplomatic meeting, again ignoring the prompt's actual topic
-  in favor of whatever is statistically common in the corpus.
+- Prompt "پاکستان ایک" (Pakistan a/one): drifts into religious-history
+  fragments about Imam Ali al-Naqi, grammatically fluent Urdu but topically
+  disconnected from the prompt, a different but equally real instance of the
+  same topical-drift failure mode seen in v1.
+- Prompt "اردو زبان" (Urdu language): stays on-topic this time, genuinely
+  coherent sentences about Urdu literature and Arabic-language books, a
+  concrete improvement over v1's repetition-loop failure on the same prompt.
+- Prompt "آج موسم" (today's weather): produces fluent, topically-relevant
+  Urdu about winter weather and temperatures, staying on-topic longer than
+  either v1 sample did.
 
-The honest summary: the model has clearly learned Urdu script, vocabulary, and
-local grammar from a small, data-limited corpus, but not topical coherence or
-prompt-following, which would need either a much larger corpus (see "What I'd
-do differently") or an instruction-tuning pass this project does not attempt.
+The honest summary: v2 is measurably more fluent (perplexity, and two of
+three sample prompts staying closer to topic) and writes essentially
+perfect Urdu script (99.75%). Factual recall (cloze) did not move outside
+noise, consistent with the parameter-capacity ceiling above, not with the
+corpus expansion having failed. Topical coherence is still not reliable
+prompt-following, which would need either a larger model, fact-structured
+training data, or an instruction-tuning pass, none of which this project
+attempts yet.
 
 ## Challenges
 
@@ -361,10 +425,24 @@ do differently") or an instruction-tuning pass this project does not attempt.
 - **Tokenizer ablations.** I shipped one 32k byte-level BPE. For a morphologically
   rich language it would be worth measuring 24k/48k vocabularies and a Unigram
   model against the same Urdu sample before committing the phase-2 vocab.
+- **Add a larger model preset.** The v2 run showed a large corpus expansion
+  raises fluency (perplexity) but not factual recall (cloze) on a
+  123.7M-parameter model, consistent with fact-storage capacity scaling with
+  parameter count more than training-text volume (Roberts et al., 2020). A
+  ~350M `medium` preset is the single most direct next step for the cloze
+  metric specifically.
+- **Train on fact-structured data, not just more prose.** Converting Wikidata
+  Urdu triples into declarative sentences and giving that slice heavy
+  repetition would target the cloze task's actual skill directly, distinct
+  entities from the eval set's 45 items, not the eval items themselves.
+- **Expand the cloze eval set.** At 45 items (43 scored) its standard error is
+  roughly ±7 points, too wide to reliably detect real accuracy changes between
+  runs. 150-300 items would make future comparisons trustworthy.
 
 ## License
 
-Code: MIT (`LICENSE`), Copyright (c) 2026 Salman Adnan. Training data carries its
-own terms: Urdu Wikipedia is CC BY-SA 4.0 and the Leipzig corpora are CC BY-NC
-4.0, so any released weights inherit a non-commercial restriction. See
+Code: PolyForm Strict License 1.0.0 (`LICENSE`), Copyright (c) 2026 Salman
+Adnan. Training data carries its own terms: Urdu Wikipedia is CC BY-SA 4.0,
+the Leipzig corpora are CC BY-NC 4.0, and CC-100 carries Common Crawl's terms
+of use, so any released weights inherit a non-commercial restriction. See
 `docs/DATA_LICENSES.md`.
