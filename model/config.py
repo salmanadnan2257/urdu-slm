@@ -1,8 +1,10 @@
 """Model configuration and size presets.
 
-The three presets track the phased plan: `tiny` is small enough to train to a
-visibly decreasing loss on a CPU, `small` is a mid-point sanity check, and
-`base` is the ~125M target reserved for the GPU run in phase 2.
+The four presets track the phased plan: `tiny` is small enough to train to a
+visibly decreasing loss on a CPU, `small` is a mid-point sanity check, `base`
+is the ~125M target reserved for the GPU run in phase 2, and `medium` is a
+~336M preset for higher factual-recall capacity (see README "What I'd do
+differently").
 """
 
 from dataclasses import dataclass
@@ -42,6 +44,10 @@ PRESETS = {
     "small": dict(n_layer=6, n_head=8, n_embd=512, max_seq_len=1024),
     # ~124M params, phase-2 GPU target
     "base": dict(n_layer=14, n_head=12, n_embd=768, max_seq_len=1024),
+    # ~336M params. Higher fact-storage capacity than `base` (Roberts et al.,
+    # 2020: capacity scales with parameter count more than training-text
+    # volume); the intended target for the next factual-recall-focused run.
+    "medium": dict(n_layer=24, n_head=16, n_embd=1024, max_seq_len=1024),
 }
 
 

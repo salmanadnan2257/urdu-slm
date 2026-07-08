@@ -95,6 +95,53 @@ def read_plain_text(path, corpus_name, max_docs=None):
             yield {"text": "\n".join(doc_lines), "source": corpus_name}
 
 
+# Declarative Urdu sentence templates per Wikidata relation (see
+# pipeline/fetch_wikidata.py). Two phrasings each for mild lexical variety;
+# alternated deterministically by row index, not randomly, so a rerun is
+# reproducible.
+_WIKIDATA_TEMPLATES = {
+    "capital": [
+        "{subject} کا دارالحکومت {object} ہے۔",
+        "{object} {subject} کا دارالحکومت ہے۔",
+    ],
+    "official_language": [
+        "{subject} کی سرکاری زبان {object} ہے۔",
+        "{object} {subject} کی سرکاری زبان ہے۔",
+    ],
+    "currency": [
+        "{subject} کی کرنسی {object} ہے۔",
+        "{object} {subject} کی کرنسی ہے۔",
+    ],
+    "continent": [
+        "{subject} {object} کا ملک ہے۔",
+        "{subject} براعظم {object} میں واقع ہے۔",
+    ],
+}
+
+
+def read_wikidata_facts(path, max_docs=None):
+    """Render Wikidata subject/relation/object triples into declarative
+    Urdu sentences. `path` is the JSONL written by pipeline.fetch_wikidata."""
+    import json
+
+    n = 0
+    with open(path, "r", encoding="utf-8") as fh:
+        for i, line in enumerate(fh):
+            line = line.strip()
+            if not line:
+                continue
+            rec = json.loads(line)
+            templates = _WIKIDATA_TEMPLATES.get(rec["relation"])
+            if not templates:
+                continue
+            template = templates[i % len(templates)]
+            text = template.format(subject=rec["subject"], object=rec["object"])
+            yield {"text": text, "source": "wikidata"}
+            n += 1
+            if max_docs and n >= max_docs:
+                return
+
+
 def read_leipzig_tar(path, corpus_name, max_docs=None):
     """Stream sentences from a Leipzig corpus tar.gz (uses *-sentences.txt)."""
     n = 0

@@ -51,7 +51,8 @@ def test_generate_runs():
 
 def test_preset_param_counts():
     """Each preset lands in its intended size band at the real 32k vocab."""
-    bands = {"tiny": (9e6, 16e6), "small": (30e6, 45e6), "base": (115e6, 135e6)}
+    bands = {"tiny": (9e6, 16e6), "small": (30e6, 45e6), "base": (115e6, 135e6),
+             "medium": (320e6, 350e6)}
     for name in PRESETS:
         cfg = build_config(name, vocab_size=32000)
         model = UrduLM(cfg)

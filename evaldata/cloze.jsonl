@@ -43,3 +43,53 @@
 {"id": 43, "stem": "کتاب میں الفاظ اور ", "options": ["صفحے ہوتے ہیں۔", "پہیے ہوتے ہیں۔", "پتے ہوتے ہیں۔"], "answer_idx": 0, "translation": "A book has words and pages."}
 {"id": 44, "stem": "گھڑی وقت ", "options": ["بتاتی ہے۔", "کھاتی ہے۔", "پکاتی ہے۔"], "answer_idx": 0, "translation": "A clock tells the time."}
 {"id": 45, "stem": "نمک کا ذائقہ ", "options": ["نمکین ہوتا ہے۔", "میٹھا ہوتا ہے۔", "کھٹا ہوتا ہے۔"], "answer_idx": 0, "translation": "Salt tastes salty."}
+{"id": 46, "stem": "بندر درخت پر ", "options": ["چڑھتا ہے۔", "تیرتا ہے۔", "اڑتا ہے۔"], "answer_idx": 0, "translation": "A monkey climbs a tree."}
+{"id": 47, "stem": "بلی چوہے کو ", "options": ["پکڑتی ہے۔", "پڑھاتی ہے۔", "سکھاتی ہے۔"], "answer_idx": 0, "translation": "The cat catches the mouse."}
+{"id": 48, "stem": "کتا رات کو ", "options": ["بھونکتا ہے۔", "اڑتا ہے۔", "تیرتا ہے۔"], "answer_idx": 0, "translation": "The dog barks at night."}
+{"id": 49, "stem": "شہد کی مکھی ", "options": ["شہد بناتی ہے۔", "دودھ دیتی ہے۔", "اون دیتی ہے۔"], "answer_idx": 0, "translation": "The honeybee makes honey."}
+{"id": 50, "stem": "بارش کے بعد آسمان پر ", "options": ["قوس قزح نظر آتی ہے۔", "برف پڑتی ہے۔", "دھواں اٹھتا ہے۔"], "answer_idx": 0, "translation": "A rainbow appears after rain."}
+{"id": 51, "stem": "موسم گرما میں لوگ ", "options": ["ہلکے کپڑے پہنتے ہیں۔", "گرم کپڑے پہنتے ہیں۔", "چھتری اوڑھتے ہیں۔"], "answer_idx": 0, "translation": "In summer people wear light clothes."}
+{"id": 52, "stem": "موسم سرما میں لوگ ", "options": ["گرم کپڑے پہنتے ہیں۔", "ہلکے کپڑے پہنتے ہیں۔", "ننگے پاؤں چلتے ہیں۔"], "answer_idx": 0, "translation": "In winter people wear warm clothes."}
+{"id": 53, "stem": "چاند رات کو آسمان پر ", "options": ["چمکتا ہے۔", "ڈوبتا ہے۔", "پگھلتا ہے۔"], "answer_idx": 0, "translation": "The moon shines in the sky at night."}
+{"id": 54, "stem": "پھول کی خوشبو ", "options": ["اچھی لگتی ہے۔", "بدبودار ہوتی ہے۔", "کڑوی ہوتی ہے۔"], "answer_idx": 0, "translation": "A flower's fragrance smells good."}
+{"id": 55, "stem": "درخت کی جڑیں زمین کے ", "options": ["اندر ہوتی ہیں۔", "اوپر ہوتی ہیں۔", "باہر لٹکتی ہیں۔"], "answer_idx": 0, "translation": "A tree's roots are inside the ground."}
+{"id": 56, "stem": "سردی میں پانی ", "options": ["برف بن جاتا ہے۔", "بھاپ بن جاتا ہے۔", "رنگ بدل لیتا ہے۔"], "answer_idx": 0, "translation": "Water turns to ice in the cold."}
+{"id": 57, "stem": "گرمی میں پانی ", "options": ["بھاپ بن جاتا ہے۔", "برف بن جاتا ہے۔", "سخت ہو جاتا ہے۔"], "answer_idx": 0, "translation": "Water turns to steam in the heat."}
+{"id": 58, "stem": "شیر کو جنگل کا ", "options": ["بادشاہ کہا جاتا ہے۔", "چوہا کہا جاتا ہے۔", "پرندہ کہا جاتا ہے۔"], "answer_idx": 0, "translation": "The lion is called the king of the jungle."}
+{"id": 59, "stem": "اونٹ کو صحرا کا ", "options": ["جہاز کہا جاتا ہے۔", "پرندہ کہا جاتا ہے۔", "بادشاہ کہا جاتا ہے۔"], "answer_idx": 0, "translation": "The camel is called the ship of the desert."}
+{"id": 60, "stem": "مکھی کے چھ ", "options": ["پاؤں ہوتے ہیں۔", "سر ہوتے ہیں۔", "دم ہوتے ہیں۔"], "answer_idx": 0, "translation": "A fly has six legs."}
+{"id": 61, "stem": "سانپ کی ٹانگیں ", "options": ["نہیں ہوتیں۔", "دو ہوتی ہیں۔", "چار ہوتی ہیں۔"], "answer_idx": 0, "translation": "A snake has no legs."}
+{"id": 62, "stem": "پرندے کے دو ", "options": ["پر ہوتے ہیں۔", "ہاتھ ہوتے ہیں۔", "سینگ ہوتے ہیں۔"], "answer_idx": 0, "translation": "A bird has two wings."}
+{"id": 63, "stem": "گائے ", "options": ["دودھ دیتی ہے۔", "انڈے دیتی ہے۔", "شہد دیتی ہے۔"], "answer_idx": 0, "translation": "The cow gives milk."}
+{"id": 64, "stem": "بطخ ", "options": ["انڈے دیتی ہے۔", "دودھ دیتی ہے۔", "اون دیتی ہے۔"], "answer_idx": 0, "translation": "A duck lays eggs."}
+{"id": 65, "stem": "بھیڑ ", "options": ["اون دیتی ہے۔", "دودھ دیتی ہے۔", "شہد دیتی ہے۔"], "answer_idx": 0, "translation": "The sheep gives wool."}
+{"id": 66, "stem": "کتابیں پڑھنے سے علم میں ", "options": ["اضافہ ہوتا ہے۔", "کمی ہوتی ہے۔", "درد ہوتا ہے۔"], "answer_idx": 0, "translation": "Reading books increases knowledge."}
+{"id": 67, "stem": "ورزش کرنے سے صحت ", "options": ["اچھی رہتی ہے۔", "خراب ہوتی ہے۔", "بگڑتی ہے۔"], "answer_idx": 0, "translation": "Exercise keeps health good."}
+{"id": 68, "stem": "مرچ کا ذائقہ ", "options": ["تیکھا ہوتا ہے۔", "میٹھا ہوتا ہے۔", "پھیکا ہوتا ہے۔"], "answer_idx": 0, "translation": "Chili tastes hot/spicy."}
+{"id": 69, "stem": "شکر کا ذائقہ ", "options": ["میٹھا ہوتا ہے۔", "نمکین ہوتا ہے۔", "کڑوا ہوتا ہے۔"], "answer_idx": 0, "translation": "Sugar tastes sweet."}
+{"id": 70, "stem": "کریلے کا ذائقہ ", "options": ["کڑوا ہوتا ہے۔", "میٹھا ہوتا ہے۔", "نمکین ہوتا ہے۔"], "answer_idx": 0, "translation": "Bitter gourd tastes bitter."}
+{"id": 71, "stem": "کافی کا ذائقہ ", "options": ["کڑوا ہوتا ہے۔", "میٹھا ہوتا ہے۔", "کھٹا ہوتا ہے۔"], "answer_idx": 0, "translation": "Coffee tastes bitter."}
+{"id": 72, "stem": "دریا کا پانی سمندر کی طرف ", "options": ["بہتا ہے۔", "رکتا ہے۔", "اڑتا ہے۔"], "answer_idx": 0, "translation": "A river's water flows toward the sea."}
+{"id": 73, "stem": "پہاڑ کی چوٹی پر برف ", "options": ["جمی رہتی ہے۔", "پگھل جاتی ہے۔", "اڑ جاتی ہے۔"], "answer_idx": 0, "translation": "Snow stays frozen on the mountain peak."}
+{"id": 74, "stem": "صحرا میں ریت ", "options": ["گرم ہوتی ہے۔", "ٹھنڈی رہتی ہے۔", "نرم اور گیلی ہوتی ہے۔"], "answer_idx": 0, "translation": "Sand in the desert is hot."}
+{"id": 75, "stem": "آگ سے ہاتھ ", "options": ["جل سکتا ہے۔", "ٹھنڈا ہو جاتا ہے۔", "صاف ہو جاتا ہے۔"], "answer_idx": 0, "translation": "A hand can burn from fire."}
+{"id": 76, "stem": "بغیر پانی کے پودا ", "options": ["مرجھا جاتا ہے۔", "اور تازہ ہوتا ہے۔", "بڑا ہو جاتا ہے۔"], "answer_idx": 0, "translation": "Without water a plant wilts."}
+{"id": 77, "stem": "سورج نکلنے سے پہلے آسمان ", "options": ["روشن ہونے لگتا ہے۔", "اندھیرا ہو جاتا ہے۔", "سرخ ہو جاتا ہے۔"], "answer_idx": 0, "translation": "Before sunrise the sky starts brightening."}
+{"id": 78, "stem": "رات کو سونے سے جسم کو ", "options": ["آرام ملتا ہے۔", "تھکاوٹ ہوتی ہے۔", "درد ہوتا ہے۔"], "answer_idx": 0, "translation": "Sleeping at night gives the body rest."}
+{"id": 79, "stem": "بھوک لگنے پر انسان ", "options": ["کھانا کھاتا ہے۔", "پانی سے نہاتا ہے۔", "سو جاتا ہے۔"], "answer_idx": 0, "translation": "When hungry a person eats food."}
+{"id": 80, "stem": "پیاس لگنے پر انسان ", "options": ["پانی پیتا ہے۔", "کھانا کھاتا ہے۔", "سو جاتا ہے۔"], "answer_idx": 0, "translation": "When thirsty a person drinks water."}
+{"id": 81, "stem": "بیمار ہونے پر لوگ ", "options": ["ڈاکٹر کے پاس جاتے ہیں۔", "اسکول جاتے ہیں۔", "کھیلنے جاتے ہیں۔"], "answer_idx": 0, "translation": "When sick people go to a doctor."}
+{"id": 82, "stem": "سکول میں بچے ", "options": ["پڑھتے ہیں۔", "کھانا پکاتے ہیں۔", "دکان چلاتے ہیں۔"], "answer_idx": 0, "translation": "Children study at school."}
+{"id": 83, "stem": "باغبان پودوں کو ", "options": ["پانی دیتا ہے۔", "جلاتا ہے۔", "کاٹ دیتا ہے۔"], "answer_idx": 0, "translation": "A gardener waters plants."}
+{"id": 84, "stem": "درزی کپڑے ", "options": ["سیتا ہے۔", "پکاتا ہے۔", "اگاتا ہے۔"], "answer_idx": 0, "translation": "A tailor sews clothes."}
+{"id": 85, "stem": "بڑھئی لکڑی سے ", "options": ["فرنیچر بناتا ہے۔", "روٹی بناتا ہے۔", "کپڑے بناتا ہے۔"], "answer_idx": 0, "translation": "A carpenter makes furniture from wood."}
+{"id": 86, "stem": "دھوبی کپڑے ", "options": ["دھوتا ہے۔", "پکاتا ہے۔", "بیچتا ہے۔"], "answer_idx": 0, "translation": "A washerman washes clothes."}
+{"id": 87, "stem": "ماہی گیر دریا سے مچھلی ", "options": ["پکڑتا ہے۔", "اگاتا ہے۔", "بناتا ہے۔"], "answer_idx": 0, "translation": "A fisherman catches fish from a river."}
+{"id": 88, "stem": "ایک ہفتے میں ", "options": ["سات دن ہوتے ہیں۔", "دس دن ہوتے ہیں۔", "تین دن ہوتے ہیں۔"], "answer_idx": 0, "translation": "A week has seven days."}
+{"id": 89, "stem": "ایک سال میں ", "options": ["بارہ مہینے ہوتے ہیں۔", "دس مہینے ہوتے ہیں۔", "بیس مہینے ہوتے ہیں۔"], "answer_idx": 0, "translation": "A year has twelve months."}
+{"id": 90, "stem": "ایک دن میں ", "options": ["چوبیس گھنٹے ہوتے ہیں۔", "دس گھنٹے ہوتے ہیں۔", "تیس گھنٹے ہوتے ہیں۔"], "answer_idx": 0, "translation": "A day has twenty-four hours."}
+{"id": 91, "stem": "ایک گھنٹے میں ", "options": ["ساٹھ منٹ ہوتے ہیں۔", "تیس منٹ ہوتے ہیں۔", "سو منٹ ہوتے ہیں۔"], "answer_idx": 0, "translation": "An hour has sixty minutes."}
+{"id": 92, "stem": "برف چھونے سے ہاتھ ", "options": ["ٹھنڈا ہو جاتا ہے۔", "گرم ہو جاتا ہے۔", "سرخ ہو جاتا ہے۔"], "answer_idx": 0, "translation": "Touching ice makes the hand cold."}
+{"id": 93, "stem": "آئینے میں دیکھنے سے اپنا ", "options": ["عکس نظر آتا ہے۔", "سایہ غائب ہو جاتا ہے۔", "رنگ بدل جاتا ہے۔"], "answer_idx": 0, "translation": "Looking in a mirror shows one's reflection."}
+{"id": 94, "stem": "پرندے گھونسلا درخت پر ", "options": ["بناتے ہیں۔", "دفن کرتے ہیں۔", "بیچتے ہیں۔"], "answer_idx": 0, "translation": "Birds build a nest on a tree."}
+{"id": 95, "stem": "مکڑی اپنا جالا ", "options": ["بناتی ہے۔", "کھاتی ہے۔", "دھوتی ہے۔"], "answer_idx": 0, "translation": "A spider makes its web."}

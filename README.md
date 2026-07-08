@@ -32,7 +32,7 @@ library.
   full resume (optimizer + scheduler + data cursor), JSONL metrics, single-GPU
   and DDP (`torchrun`) paths, deterministic seeding.
 - **Evaluation** (`eval/`): held-out perplexity, a script-mix diagnostic, and a
-  few-shot cloze harness over a hand-written 45-item Urdu eval set
+  few-shot cloze harness over a hand-written 95-item Urdu eval set
   (`evaldata/`).
 - **GPU-run readiness**: `configs/base.yaml` + `docs/GPU_RUN.md` with the launch
   command, a cost estimate, and Chinchilla-style token-budget reasoning.
@@ -302,23 +302,33 @@ filtering, and exact + near dedup.
 | Script mix (Arabic script) | 99.43% (20 generations) | **99.75%** (50 generations) |
 | Cloze accuracy (2-shot) | 34.9% (15/43, chance 33.3%) | **39.5%** (17/43, chance 33.3%) |
 
-Read honestly, including the caveat that matters most: the cloze harness is
-**45 items (43 scored)**, so its standard error at this sample size is roughly
-±7 percentage points. The 34.9% → 39.5% move is a 2-item difference and sits
-comfortably inside that noise band, it is not a number I can call a real
-improvement. The perplexity gain (38.02 → 28.93, a genuine ~24% reduction) is
-real and expected: ~7.7x more unique tokens and a token/parameter ratio much
-closer to Chinchilla-optimal directly improves general language modeling.
-Why cloze barely moved despite that: a 124M-parameter model has a real,
+Read honestly, including the caveat that matters most: both numbers above
+were measured on the **original 45-item (43 scored) cloze harness**, whose
+standard error at that sample size is roughly ±7 percentage points. The
+34.9% → 39.5% move is a 2-item difference and sits comfortably inside that
+noise band, it is not a number I can call a real improvement. The perplexity
+gain (38.02 → 28.93, a genuine ~24% reduction) is real and expected: ~7.7x
+more unique tokens and a token/parameter ratio much closer to
+Chinchilla-optimal directly improves general language modeling. Why cloze
+barely moved despite that: a 124M-parameter model has a real,
 literature-supported ceiling on how many discrete facts it can store
 regardless of how much prose it reads (Roberts et al., 2020, "How Much
 Knowledge Can You Pack Into the Parameters of a Language Model?"; storage
 capacity scales with parameter count, not primarily with training-text
 volume). More text made the model more fluent; it did not meaningfully raise
-how many facts it can recall. The two most evidence-backed next levers are a
-larger model (more parameters, more fact-storage capacity) and training data
-built specifically as declarative fact statements (e.g. from Wikidata
-triples), not just more general prose; see "What I'd do differently".
+how many facts it can recall.
+
+**The cloze eval set was expanded from 45 to 95 items on 2026-07-08**
+(`evaldata/cloze.jsonl`), specifically because the old set's noise band was
+too wide to trust future comparisons. The v2 model's real score on the
+larger set: **45.2% (42/93 scored, 2-shot)**, standard error roughly ±5.2
+points, still not directly comparable to the 34.9%/39.5% figures above since
+the item set itself changed, but this is the number future runs (the planned
+`medium` preset run below) should be compared against. The two most
+evidence-backed next levers for actually moving this number are a larger
+model (more parameters, more fact-storage capacity) and training data built
+specifically as declarative fact statements (Wikidata triples, added to the
+pipeline the same day, see "Planned next run" below).
 
 Three real sample generations from v2
 (`python sample.py --ckpt runs/base_v2/model.pt`), shown as evidence, not
@@ -428,19 +438,54 @@ attempts yet.
 - **Tokenizer ablations.** I shipped one 32k byte-level BPE. For a morphologically
   rich language it would be worth measuring 24k/48k vocabularies and a Unigram
   model against the same Urdu sample before committing the phase-2 vocab.
-- **Add a larger model preset.** The v2 run showed a large corpus expansion
-  raises fluency (perplexity) but not factual recall (cloze) on a
-  123.7M-parameter model, consistent with fact-storage capacity scaling with
-  parameter count more than training-text volume (Roberts et al., 2020). A
-  ~350M `medium` preset is the single most direct next step for the cloze
-  metric specifically.
-- **Train on fact-structured data, not just more prose.** Converting Wikidata
-  Urdu triples into declarative sentences and giving that slice heavy
-  repetition would target the cloze task's actual skill directly, distinct
-  entities from the eval set's 45 items, not the eval items themselves.
-- **Expand the cloze eval set.** At 45 items (43 scored) its standard error is
-  roughly ±7 points, too wide to reliably detect real accuracy changes between
-  runs. 150-300 items would make future comparisons trustworthy.
+
+## Planned next run: `medium` preset + Wikidata facts (not yet executed)
+
+Three pieces are built and tested (13 tests passing), but not yet run:
+
+- **`medium` preset** (`model/config.py`): 336.38M params (24 layers, 1024
+  d_model, 16 heads), added because fact-storage capacity scales with
+  parameter count more than training-text volume (Roberts et al., 2020), the
+  documented reason v2's corpus expansion barely moved cloze accuracy.
+- **Wikidata fact pipeline** (`pipeline/fetch_wikidata.py`,
+  `pipeline.sources.read_wikidata_facts`): queries the public Wikidata SPARQL
+  endpoint (CC0, no auth) for country capital/official-language/currency/
+  continent facts with real Urdu labels, and renders them into declarative
+  sentences distinct from the eval set's own facts. Verified live on
+  2026-07-08: 890 real triples fetched, 865 survived the corpus-wide dedup
+  pass (2.81% dropped, legitimate near-duplicates like several countries
+  sharing English as an official language).
+- **Expanded cloze eval set**: 45 → 95 items (`evaldata/cloze.jsonl`), cutting
+  the standard error from roughly ±7 to ±5.2 points. The v2 model's real score
+  on it is the new baseline: **45.2% (42/93, 2-shot)**.
+
+### Real, honest cost estimate for actually running it
+
+Not yet run, so this is a scaling estimate from the v2 run's *measured*
+~105,000 tok/s at 124M params, not a measurement: compute per token scales
+roughly with parameter count, so 336M/124M ≈ 2.71x fewer tokens/second,
+projecting to **~38,700 tok/s**. Config in `configs/medium.yaml`: 3.45B
+tokens (4 epochs of the 862.4M-token main mix, the repeat count Muennighoff
+et al. (2023) found costs near-zero value versus fresh data up to 4x), plus a
+larger Wikipedia/Wikidata-heavy anneal phase than v2 used.
+
+| | Estimate |
+|---|---|
+| Main-phase training (3.45B tokens @ ~38,700 tok/s) | ~24.8 hours |
+| Anneal phase (~200M tokens, larger share than v2's 100M) | ~1.4 hours |
+| Corpus pipeline (CPU, similar to v2's 2h47m plus a small Wikidata fetch) | ~2.8 hours |
+| **Total GPU-pod time** | **~29 hours** |
+| **Total cost** (A100 SXM 80GB, $1.39-1.49/hr) | **~$40-45** |
+
+Two real uncertainties, flagged rather than hidden: the throughput scaling is
+a compute-bound estimate, not measured, so actual tok/s could differ; and
+`configs/medium.yaml`'s `batch_size: 32` is carried over from `base.yaml`
+unverified against the larger model's VRAM footprint (base used 36GB/80GB;
+medium's activations scale with layers x d_model, roughly 2.3x, which could
+approach the 80GB ceiling and require a smaller batch size with higher
+gradient accumulation to compensate, same total compute, same cost). The
+right first step on launch is a short smoke-test (a few hundred steps) to
+confirm both numbers before committing the full budget.
 
 ## License
 

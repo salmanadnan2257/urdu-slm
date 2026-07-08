@@ -1,0 +1,35 @@
+# Medium preset (~336M). Not yet run; added 2026-07-08 as the planned next
+# step for factual-recall capacity (see README "What I'd do differently").
+# batch_size/grad_accum below are carried over from base.yaml's known-working
+# values, not yet verified against this preset's larger memory footprint;
+# re-check actual VRAM headroom on first launch and reduce batch_size if needed.
+preset: medium
+vocab_size: 32000
+data_dir: data
+out_dir: runs/medium
+
+block_size: 1024
+batch_size: 32
+grad_accum: 16         # effective ~524k tokens/step, unverified for this preset's size
+
+# 3.45B tokens = 4 epochs of the 862.4M-token v2 main-mix corpus (plus the
+# separate Wikipedia/Wikidata-heavy anneal on top, launched as a second
+# train.py invocation with --resume, the same two-phase pattern as base_v2).
+# 4 epochs is chosen because Muennighoff et al. (2023) found repeating data
+# up to 4 epochs costs near-zero value versus fresh tokens; going further
+# would need either more real data or accepting the documented value decay.
+# This is still below Chinchilla-optimal for 336M params (~6.72B tokens);
+# reaching that would need ~2x this budget or a larger real corpus.
+max_tokens: 3450000000
+warmup_steps: 1500
+lr: 0.00025
+min_lr: 0.000025
+beta2: 0.95
+weight_decay: 0.1
+grad_clip: 1.0
+
+seed: 1337
+log_interval: 20
+eval_interval: 1000
+eval_iters: 200
+ckpt_interval: 2000

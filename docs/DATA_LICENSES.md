@@ -52,6 +52,29 @@ was verified reachable from this machine on 2026-07-06.
 - Not used in the v1 (2026-07-06) corpus, skipped then to keep the download
   modest and the first proof run fast.
 
+## 4. Wikidata (fact triples), added 2026-07-08 for the planned `medium` run
+
+- Endpoint: https://query.wikidata.org/sparql (public SPARQL Query Service,
+  no authentication).
+- License: Wikidata's own content is dedicated to the public domain under
+  CC0 1.0 (https://www.wikidata.org/wiki/Wikidata:Licensing). No restriction
+  inherited from this source, unlike Leipzig's CC BY-NC.
+- Use here: `pipeline.fetch_wikidata` queries four relations (a country's
+  capital, official language, currency, continent) restricted to rows where
+  both the subject and object have a real Urdu label (rows falling back to
+  another language are dropped), and writes the raw subject/relation/object
+  triples to a JSONL file. `pipeline.sources.read_wikidata_facts` renders
+  each triple into one of two fixed Urdu declarative-sentence templates per
+  relation (alternated by row index for lexical variety) and feeds it into
+  the pipeline as a `wikidata` source. Real test run on 2026-07-08 returned
+  890 triples across all four relations; 865 survived the corpus-wide
+  MinHash near-dedup (2.81% dropped, mostly countries that legitimately
+  share an object, e.g. several sharing English as an official language).
+- Purpose: distinct entities from the eval set's own 45 cloze items, chosen
+  because Wikidata's fact-storage-capacity research (see README) motivates
+  giving the model dense, repeated, unambiguous exposure to this specific
+  fact category rather than diffuse prose mentions of the same fact.
+
 ## Sources considered and skipped
 
 - OSCAR / mC4 Urdu: gated behind Hugging Face auth or a click-through, so
@@ -61,6 +84,9 @@ was verified reachable from this machine on 2026-07-06.
 
 Raw downloads are kept out of the repository (they live in a scratch directory
 during the build and are deleted afterward). To rebuild the v2 corpus, download
-all four URLs above into a directory and run the command in the top-level
-README under "Reproduce the corpus"; drop the CC-100 file and the upsample
-flags to rebuild the smaller v1 corpus instead.
+the three URLs in sections 1-3 into a directory and run the command in the
+top-level README under "Reproduce the corpus"; drop the CC-100 file and the
+upsample flags to rebuild the smaller v1 corpus instead. To add Wikidata
+facts for the `medium` run, also run `pipeline.fetch_wikidata` into the same
+directory first, then pass `--wikidata wikidata_facts.jsonl` to
+`pipeline.build_corpus`.

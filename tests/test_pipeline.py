@@ -1,7 +1,12 @@
 """Tests for normalization, filtering, and dedup logic."""
 
+import json
+import tempfile
+from pathlib import Path
+
 from pipeline.normalize import normalize, keep_line, arabic_ratio
 from pipeline.dedup import Deduper, exact_key
+from pipeline.sources import read_wikidata_facts
 
 
 def test_normalize_folds_arabic_variants():
@@ -45,3 +50,22 @@ def test_near_dedup():
 
 def test_exact_key_stable():
     assert exact_key("test") == exact_key("test")
+
+
+def test_read_wikidata_facts_renders_declarative_sentences():
+    rows = [
+        {"relation": "capital", "subject": "جاپان", "object": "ٹوکیو"},
+        {"relation": "official_language", "subject": "کینیڈا", "object": "انگریزی"},
+        {"relation": "unknown_relation", "subject": "x", "object": "y"},
+    ]
+    with tempfile.TemporaryDirectory() as td:
+        path = Path(td) / "wikidata_facts.jsonl"
+        with open(path, "w", encoding="utf-8") as fh:
+            for r in rows:
+                fh.write(json.dumps(r, ensure_ascii=False) + "\n")
+        docs = list(read_wikidata_facts(path))
+    # the unknown relation has no template and is skipped
+    assert len(docs) == 2
+    assert all(d["source"] == "wikidata" for d in docs)
+    assert "جاپان" in docs[0]["text"] and "ٹوکیو" in docs[0]["text"]
+    assert "کینیڈا" in docs[1]["text"] and "انگریزی" in docs[1]["text"]
