@@ -1,5 +1,5 @@
 % explainer-source-hash: f853827457ce4135f852201be81a6e16bb0e75ff89457f8e3540348443911a82
-% explainer-source-commit: a0adde8872a5b2ad97203deeb662f65644532a78
+% explainer-source-commit: 63f18f95db27c45910ef56ad52463f8853a5e12a
 % explainer-generated: 2026-07-16
 % Regenerate with /explain-all (see WIRING.md). Do not edit this stamp by hand:
 % it is how the toolchain knows whether this document still matches the code.
@@ -674,8 +674,10 @@ into "look in a few buckets".
   \draw[flow] (min) -- (q);
   \draw[flow] (q) -- node[lbl,above] {yes} (drop);
   \draw[flow] (q) -- node[lbl,right] {no} (keep);
-  \node[extbox,text width=5.0cm,anchor=north west] at ($(doc.south west)+(0,-1.6)$)
-    {\scriptsize The two boxed numpy operations replace\\ datasketch's per-shingle Python loop.\\ Measured: ~250 docs/s to ~2400 docs/s.};
+  \node[extbox,text width=6.6cm,below=9mm of keep]
+    {\scriptsize The two numpy operations above (the affine permutations and the min)\\
+     replace datasketch's per-shingle Python loop.\\
+     Measured on real Wikipedia paragraphs: $\sim$250 docs/s to $\sim$2400 docs/s.};
 \end{tikzpicture}}
 \caption{The near-duplicate path for a single document. Exact blake2b dedup runs first
 and short-circuits before any of this.}
@@ -1060,17 +1062,20 @@ compression gain: 5.23x fewer tokens with our tokenizer
 \begin{axis}[
   width=13cm, height=6.0cm,
   xbar, y=9mm, bar width=6mm,
-  xmin=0, xmax=1180000,
+  xmin=0, xmax=1380000,
   xlabel={tokens spent on the same 806,495 characters of Urdu (lower is better)},
   symbolic y coords={gpt2,ours},
   ytick=data,
   yticklabels={GPT-2 (50k English BPE), ours (32k Urdu BPE)},
   nodes near coords, nodes near coords align={horizontal},
-  nodes near coords style={font=\footnotesize,text=inkblue},
+  nodes near coords style={font=\footnotesize, text=inkblue,
+    /pgf/number format/fixed, /pgf/number format/precision=0,
+    /pgf/number format/1000 sep={,}},
   every axis plot/.append style={fill=accent!55, draw=inkblue},
   tick label style={font=\small}, label style={font=\small},
   xmajorgrids, grid style={linegrey},
-  scaled x ticks=false, xticklabel style={/pgf/number format/fixed,
+  scaled x ticks=false, xtick={0,250000,500000,750000,1000000},
+  xticklabel style={font=\small, /pgf/number format/fixed,
     /pgf/number format/1000 sep={,}},
   enlarge y limits=0.55,
 ]
@@ -1195,7 +1200,8 @@ tied it is counted once, not twice.}
   xlabel={parameters (millions)},
   symbolic y coords={medium,base,small,tiny},
   ytick=data, tick label style={font=\small}, label style={font=\small},
-  legend style={font=\footnotesize, at={(0.98,0.06)}, anchor=south east, draw=linegrey},
+  legend style={font=\footnotesize, at={(0.985,0.95)}, anchor=north east, draw=linegrey,
+    fill=white, fill opacity=0.92, text opacity=1},
   xmajorgrids, grid style={linegrey}, enlarge y limits=0.28,
 ]
 \addplot[fill=warnred!45, draw=warnred] coordinates {(8.19,tiny) (16.38,small) (24.58,base) (32.77,medium)};
@@ -1210,7 +1216,7 @@ honestly rather than hiding.}
 \end{figure}
 
 \begin{keyidea}{The "10M-parameter model" is a fiction, and the project says so}
-The \code{tiny} preset's comment in \file{configs/tiny.yaml} still says "~10M params",
+The \code{tiny} preset's comment in \file{configs/tiny.yaml} still says "\textasciitilde{}10M params",
 but a 32,000-token vocabulary at \code{d\_model}=256 costs 8.19M parameters before a
 single transformer block exists. The blocks add only 4.82M. So a genuinely tiny
 transformer still lands at 13.0M, and the initial parameter-count test failed at 15.2M
@@ -1227,23 +1233,22 @@ This is a good thing to be able to say out loud in an interview.
 
 \begin{figure}[H]
 \centering
-\resizebox{0.98\textwidth}{!}{
-\begin{tikzpicture}[node distance=6mm]
-  \node[store,text width=2.4cm] (in) {token ids\\ \scriptsize (B, T) int64};
-  \node[box,right=9mm of in,text width=2.5cm] (emb) {\code{tok\_emb}\\ \scriptsize Embedding\\ 32000 x d\_model};
-  \node[box,right=8mm of emb,text width=1.7cm] (drop) {\code{drop}\\ \scriptsize Dropout};
+\begin{tikzpicture}[node distance=5mm]
+  % ==== main vertical spine ====
+  \node[store,text width=3.0cm] (in) {token ids\\ \scriptsize (B, T) int64};
+  \node[box,below=of in,text width=3.0cm] (emb) {\code{tok\_emb}\\ \scriptsize Embedding, 32000 x d\_model};
+  \node[box,below=of emb,text width=3.0cm] (drop) {\code{drop}\\ \scriptsize Dropout};
 
-  % the block
-  \node[box,right=10mm of drop,text width=2.2cm,fill=softgrey] (n1) {\code{attn\_norm}\\ \scriptsize RMSNorm};
-  \node[box,right=7mm of n1,text width=2.6cm] (att) {\code{attn}\\ \scriptsize RoPE causal\\ self-attention};
-  \node[dec,right=7mm of att,text width=0.6cm] (add1) {$+$};
-  \node[box,right=8mm of add1,text width=2.2cm,fill=softgrey] (n2) {\code{mlp\_norm}\\ \scriptsize RMSNorm};
-  \node[box,right=7mm of n2,text width=2.0cm] (mlp) {\code{mlp}\\ \scriptsize SwiGLU};
-  \node[dec,right=7mm of mlp,text width=0.6cm] (add2) {$+$};
+  \node[box,below=8mm of drop,text width=3.0cm,fill=softgrey] (n1) {\code{attn\_norm}\\ \scriptsize RMSNorm};
+  \node[box,below=of n1,text width=3.0cm] (att) {\code{attn}\\ \scriptsize RoPE causal self-attention};
+  \node[dec,below=of att] (add1) {$+$};
+  \node[box,below=of add1,text width=3.0cm,fill=softgrey] (n2) {\code{mlp\_norm}\\ \scriptsize RMSNorm};
+  \node[box,below=of n2,text width=3.0cm] (mlp) {\code{mlp}\\ \scriptsize SwiGLU};
+  \node[dec,below=of mlp] (add2) {$+$};
 
-  \node[box,right=9mm of add2,text width=2.2cm,fill=softgrey] (fn) {\code{final\_norm}\\ \scriptsize RMSNorm};
-  \node[box,right=7mm of fn,text width=2.3cm] (head) {\code{lm\_head}\\ \scriptsize Linear, no bias};
-  \node[store,right=8mm of head,text width=2.5cm] (out) {logits\\ \scriptsize (B, T, 32000)};
+  \node[box,below=8mm of add2,text width=3.0cm,fill=softgrey] (fn) {\code{final\_norm}\\ \scriptsize RMSNorm};
+  \node[box,below=of fn,text width=3.0cm] (head) {\code{lm\_head}\\ \scriptsize Linear, no bias};
+  \node[store,below=of head,text width=3.0cm] (out) {logits\\ \scriptsize (B, T, 32000)};
 
   \draw[flow] (in) -- (emb);
   \draw[flow] (emb) -- (drop);
@@ -1257,23 +1262,30 @@ This is a good thing to be able to say out loud in an interview.
   \draw[flow] (fn) -- (head);
   \draw[flow] (head) -- (out);
 
-  % residual skips
-  \draw[dflow] (drop.north) to[out=60,in=120] (add1.north);
-  \draw[dflow] (add1.north) to[out=60,in=120] (add2.north);
+  % ==== residual skips, down the left ====
+  \draw[dflow] (drop.west) to[out=180,in=180,looseness=1.5] (add1.west);
+  \draw[dflow] (add1.west) to[out=180,in=180,looseness=1.5] (add2.west);
+  \node[lbl,left=1mm of $(drop.west)!0.5!(add1.west)$,text width=2.1cm]
+    {residual:\\ attention writes\\ a correction};
+  \node[lbl,left=1mm of $(add1.west)!0.5!(add2.west)$,text width=2.1cm]
+    {residual:\\ the MLP writes\\ a correction};
 
-  % rope feed
-  \node[extbox,below=13mm of att,text width=2.9cm] (rope) {\code{\_rope(T,...)}\\ \scriptsize cos/sin cache};
+  % ==== RoPE cache feeds attention from the right ====
+  \node[extbox,right=9mm of att,text width=2.7cm] (rope) {\code{\_rope(...)}\\ \scriptsize cos/sin cache,\\ applied to q and k only};
   \draw[dflow] (rope) -- (att);
 
-  % tied weights
-  \draw[dflow] (emb.south) to[out=-90,in=-90,looseness=0.35] node[lbl,below] {tied: one weight matrix, used twice} (head.south);
+  % ==== tied weights: routed well clear on the far right ====
+  \draw[dflow] (emb.east) -- ++(6.4,0) coordinate (tie) |- (head.east);
+  \node[lbl,anchor=west,text width=2.7cm] at ($(tie)+(0.15,-3.1)$)
+    {tied: one weight matrix,\\ used twice\\ \scriptsize (saves 24.6M params\\ in \code{base})};
 
   \begin{scope}[on background layer]
-    \node[draw=accent,dashed,rounded corners=3pt,inner sep=7pt,
+    \node[draw=accent,dashed,rounded corners=3pt,inner sep=6pt,
           fit=(n1)(att)(add1)(n2)(mlp)(add2)] (blk) {};
   \end{scope}
-  \node[lbl,above=1mm of blk.north] {\code{Block}, repeated \code{n\_layer} times (14 for base)};
-\end{tikzpicture}}
+  \node[lbl,anchor=west,text width=2.5cm] at ($(blk.south east)+(0.3,0.75)$)
+    {\code{Block},\\ repeated \code{n\_layer}\\ times (14 for \code{base})};
+\end{tikzpicture}
 \caption{The full forward pass. Dashed arrows are residual connections and the tied
 weight matrix. Note that both norms sit \emph{before} their sublayer, not after.}
 \label{fig:block}
@@ -1468,7 +1480,7 @@ Flash-ready causal transformer with no hand-written mask" is accurate.
 An attention implementation that never writes the full (T x T) attention matrix to GPU
 memory, computing it in tiles inside fast on-chip memory instead. It is exact, not an
 approximation, and it is the reason a 1024-token context is cheap. It is what delivered
-the measured ~105,000 tokens/second in Section~\ref{sec:runs}.
+the measured $\sim$105,000 tokens/second in Section~\ref{sec:runs}.
 \end{jargon}
 
 \code{bias=False} on all four projections is another Llama-family choice: biases
@@ -1740,7 +1752,7 @@ and rank 0's saved cursor is valid for the whole job.
       more distinct contexts from the same data. Again small, again free.
 \item \textbf{No \code{DataLoader}, no prefetch thread.} Batches are built synchronously
       in the training loop, so the GPU idles during the numpy slicing and the host-to-
-      device copy. At the measured ~105,000 tokens/second this evidently was not the
+      device copy. At the measured $\sim$105,000 tokens/second this evidently was not the
       bottleneck, so the simplicity was the right trade. It is worth knowing it is a
       trade.
 \end{itemize}
@@ -2031,7 +2043,7 @@ the conventional relationship.}
 This is the most consequential documentation gap in the project.
 
 The committed \file{configs/base.yaml} says \code{max\_tokens: 450000000}, and its
-comment explains that as "~4 epochs of the 111.7M-token corpus". Both are v1-era facts.
+comment explains that as "\textasciitilde{}4 epochs of the 111.7M-token corpus". Both are v1-era facts.
 The README states that \code{runs/base\_v2}, the project's headline model, trained on
 \textbf{2,499,805,184} tokens. That is $4{,}768 \times 524{,}288$, confirmed exactly
 against the committed \file{runs/base\_v2/metrics.jsonl}, whose last logged step is 4,760.
@@ -2050,8 +2062,8 @@ is missing.
 \end{honest}
 
 \begin{honest}{Two stale comments in the configs}
-\file{configs/tiny.yaml}'s header says "~10M params"; the real figure is 13.01M, measured
-above. \file{configs/base.yaml}'s \code{grad\_accum} comment says "effective ~524k
+\file{configs/tiny.yaml}'s header says "\textasciitilde{}10M params"; the real figure is 13.01M, measured
+above. \file{configs/base.yaml}'s \code{grad\_accum} comment says "effective \textasciitilde{}524k
 tokens/step on a single 24GB GPU"; both real runs used an A100 SXM \textbf{80GB}. Neither
 misleads about anything load-bearing, and the README is scrupulous about the 13M figure
 elsewhere, so these are simply comments that were not revisited. \file{configs/medium.yaml},
@@ -2405,7 +2417,7 @@ the correct choice and the harder one.
 \toprule
 Date and hardware & 2026-07-07, rented A100 SXM 80GB (RunPod) \\
 Steps and tokens & 858 steps, 449.8M tokens, roughly 4 epochs of the v1 corpus \\
-Measured throughput & ~99,470 tokens/second sustained \\
+Measured throughput & $\sim$99,470 tokens/second sustained \\
 Wall clock and cost & about 75 minutes, about \$1.90 \\
 Loss & first logged 9.5863 (step 20), last logged 3.5087 (step 840) \\
 Held-out perplexity & 38.02 \\
@@ -2448,7 +2460,7 @@ a Wikipedia-only anneal.
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-  width=13.4cm, height=6.4cm,
+  width=8.8cm, height=6.4cm,
   xlabel={step (524,288 tokens each)}, ylabel={train loss (nats)},
   xmin=0, xmax=4850, ymin=2.3, ymax=10,
   tick label style={font=\small}, label style={font=\small},
@@ -2464,10 +2476,35 @@ a Wikipedia-only anneal.
 (3740,2.583) (3860,2.605) (3980,2.584) (4100,2.496) (4220,2.612) (4340,2.550)
 (4460,2.469) (4580,2.729) (4700,2.773) (4760,2.741) };
 \draw[warnred, thick, dashed] (axis cs:4570,2.3) -- (axis cs:4570,10);
-\node[lbl, anchor=south east, text=warnred] at (axis cs:4550,6.6)
-  {anneal starts: data source\\ switches to Wikipedia-only};
+\node[lbl, anchor=south east, text=warnred, font=\scriptsize] at (axis cs:4540,6.4)
+  {anneal starts};
 \legend{train loss}
 \end{axis}
+%
+\begin{axis}[
+  at={(8.7cm,0)}, anchor=south west,
+  width=6.0cm, height=6.4cm,
+  xlabel={step (zoom)}, ylabel={},
+  xmin=4390, xmax=4770, ymin=2.40, ymax=2.86,
+  tick label style={font=\scriptsize}, label style={font=\small},
+  xtick={4400,4500,4600,4700}, xticklabel style={/pgf/number format/fixed,
+    /pgf/number format/1000 sep={,}},
+  xmajorgrids, ymajorgrids, grid style={linegrey},
+  title={\small the anneal switch, every logged point},
+  title style={font=\small, text=inkblue},
+]
+\addplot[draw=accent, thick, mark=*, mark size=1.1pt] coordinates {
+(4400,2.5372) (4420,2.5413) (4440,2.5392) (4460,2.4686) (4480,2.5343) (4500,2.5530)
+(4520,2.5075) (4540,2.5336) (4560,2.5648) };
+\addplot[draw=warnred, thick, mark=*, mark size=1.1pt] coordinates {
+(4580,2.7288) (4600,2.7339) (4620,2.7435) (4640,2.8064) (4660,2.7618) (4680,2.7515)
+(4700,2.7733) (4720,2.7443) (4740,2.6574) (4760,2.7414) };
+\draw[warnred, thick, dashed] (axis cs:4570,2.40) -- (axis cs:4570,2.86);
+\node[lbl, anchor=north east, text=warnred, font=\scriptsize] at (axis cs:4562,2.855)
+  {Wikipedia-only\\ from here};
+\node[lbl, anchor=south west, font=\scriptsize] at (axis cs:4398,2.415) {CC-100 mix};
+\end{axis}
+
 \end{tikzpicture}
 \caption{The v2 run, every 6th logged point from the committed
 \file{runs/base\_v2/metrics.jsonl}, plus the final point. The loss step at the anneal
@@ -2523,7 +2560,7 @@ Held-out perplexity & 38.02 & \textbf{28.93} \\
 Script mix (Arabic) & 99.43\% (20 gens) & \textbf{99.75\%} (50 gens) \\
 Cloze, 45-item set & 34.9\% (15/43) & 39.5\% (17/43) \\
 Cloze, 95-item set & not measured & 45.2\% (42/93) \\
-GPU time and cost & ~75 min, ~\$1.90 & 6h 39m, ~\$13.06 \\
+GPU time and cost & $\sim$75 min, $\sim$\$1.90 & 6h 39m, $\sim$\$13.06 \\
 \bottomrule
 \end{tabular}
 \caption{The two GPU runs. Cloze figures are README-reported; the perplexity, script-mix
@@ -2581,7 +2618,7 @@ repo is the CPU proof run."}
 Two GPU runs have since happened, and the committed logs show a real sustained
 \textbf{99,470} tok/s (v1) and \textbf{105,000} tok/s (v2). The "conservative" estimate
 was low by a factor of about 3.3. Every downstream figure in that document inherits the
-error: it projects the 450M-token run at ~4.2 hours for about \$6, where v1 actually did
+error: it projects the 450M-token run at $\sim$4.2 hours for about \$6, where v1 actually did
 449.8M tokens in about 75 minutes for about \$1.90.
 
 Its token-budget section is v1-era throughout ("our cleaned corpus is 111.7M training
@@ -2624,12 +2661,12 @@ be a bigger model plus training data shaped as dense declarative facts. Hence
 \end{keyidea}
 
 The cost estimate in the README is explicitly labelled a projection, and its uncertainties
-are named rather than buried: throughput is scaled from v2's measured ~105,000 tok/s by
-the parameter ratio ($336/124 \approx 2.71$, projecting ~38,700 tok/s), which assumes
+are named rather than buried: throughput is scaled from v2's measured $\sim$105,000 tok/s by
+the parameter ratio ($336/124 \approx 2.71$, projecting $\sim$38,700 tok/s), which assumes
 compute-bound scaling; and \file{configs/medium.yaml}'s \code{batch\_size: 32} is
 inherited from \code{base.yaml} and unverified against a model whose activations are
 roughly 2.3x larger, where \code{base} already used 36GB of 80GB. The recommendation to
-smoke-test a few hundred steps before committing the ~\$40-45 budget is the right one.
+smoke-test a few hundred steps before committing the $\sim$\$40-45 budget is the right one.
 
 \begin{honest}{The one thing to fix before launching}
 The Wikidata contamination described in Section~\ref{sec:cloze}. The \code{medium} run
@@ -2654,7 +2691,7 @@ some of these, and it is better to get there first.
 \begin{enumerate}
 \item \textbf{Upsampling repeats documents back-to-back inside a single context window}
       (Section~\ref{sec:tokenizer}). \code{buf.extend(ids * reps)} lays three copies of a
-      Wikipedia paragraph down contiguously, and at ~70 tokens per paragraph all three
+      Wikipedia paragraph down contiguously, and at $\sim$70 tokens per paragraph all three
       fit inside one 1024-token block. This teaches copying rather than reweighting the
       distribution, and it shipped in the run that produced the headline model. Cheap to
       fix at the document-list level.
@@ -2737,7 +2774,7 @@ some of these, and it is better to get there first.
       (Section~\ref{sec:tokenizer}). Two inert vocabulary slots.
 \item \textbf{The RoPE cache keys on \code{T} but ignores it}, so \code{generate} builds
       one identical full-size cache entry per token sampled.
-\item \textbf{Stale config comments}: \file{tiny.yaml} says "~10M params" (real: 13.01M);
+\item \textbf{Stale config comments}: \file{tiny.yaml} says "\textasciitilde{}10M params" (real: 13.01M);
       \file{base.yaml} says "single 24GB GPU" (real: A100 80GB).
 \item \textbf{\file{data/corpus\_stats.json} describes v1 only}; there is no committed
       stats file for the v2 corpus the headline model trained on.
@@ -2849,9 +2886,9 @@ v1 corpus funnel (3.7M paragraphs, 31.94\% dedup, 2,489,976 / 25,106 split) &
     \textbf{verified} & read \file{data/corpus\_stats.json} \\
 Tiny run: loss 9.74 to 5.42, val 5.87 to 5.36 & \textbf{verified} &
     read \file{runs/tiny/metrics.jsonl} \\
-v1: 858 steps, 449.8M tokens, ~99,470 tok/s & \textbf{verified} &
+v1: 858 steps, 449.8M tokens, $\sim$99,470 tok/s & \textbf{verified} &
     read \file{runs/base/metrics.jsonl} \\
-v2: 4,768 steps, 2,499,805,184 tokens, ~105,000 tok/s, loss to ~2.74 &
+v2: 4,768 steps, 2,499,805,184 tokens, $\sim$105,000 tok/s, loss to $\sim$2.74 &
     \textbf{verified} & read \file{runs/base\_v2/metrics.jsonl}; token count is exactly
     $4768 \times 524288$ \\
 v2 anneal caused a brief loss rise & \textbf{verified} & visible at step 4560 to 4580
